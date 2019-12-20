@@ -1,0 +1,40 @@
+#pragma once
+
+template<class T, size_t initNum = 100>//initNum每次多少内存
+class ObjectPool
+{
+public:
+	ObjectPool()
+	{
+		_start = _end = (char*)malloc(initNum * sizeof(T));
+	}
+	T* New()//T* Alloc() //开空间，从内存池开不是从系统开
+	{
+		if (_start == _end)
+		{
+			_start = _end = (char*)malloc(initNum * sizeof(T));//走到_end了则再申请内存
+		}
+		T* obj = (T*)_start;
+		_start += sizeof(T);
+		//给已有的空间调构造函数初始化
+		//new的定位表达式
+		new(obj)T;
+		return obj;
+	}
+
+	void Delete(T* ptr)//释放
+	{
+		//先调析构函数再释放空间，要先找到资源//把空间还给链表
+		ptr->~T();
+		//使用的内存直接放到一个链表里//T* _freList指向第一个，每个的头4个字节（32位，64位8个）存下一个的地址
+		*(int*)ptr = _freList;
+		_freList = ptr;
+		
+	}
+
+private:
+	char* _start;
+	char* _end;//管理内存指针
+	T* _freList;//存内存的链表
+
+};
