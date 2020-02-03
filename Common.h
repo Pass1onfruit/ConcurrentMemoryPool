@@ -60,7 +60,6 @@ public:
 
 private:
 	void* _freelist    = nullptr;//默认初始化为空
-
 };
 
 class size_class
