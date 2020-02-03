@@ -28,8 +28,7 @@ public:
 		ptr->~T();
 		//使用的内存直接放到一个链表里//T* _freList指向第一个，每个的头4个字节（32位，64位8个）存下一个的地址
 		*(int*)ptr = _freList;
-		_freList = ptr;
-		
+		_freList = ptr;	
 	}
 
 private:
