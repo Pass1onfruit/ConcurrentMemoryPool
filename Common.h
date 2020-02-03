@@ -50,6 +50,7 @@ public:
 		start = _freelist;
 		end = prev;
 		_freelist = cur;
+		
 		return actual_num;
 	}
 
@@ -81,7 +82,7 @@ typedef unsigned int PAGE_ID;
 #else
 typedef unsigned long long PAGE_ID;//long long // 2^64
 #endif
-
+/////
 #ifdef _X86
 typedef unsigned int PAGE_ID;
 #else
