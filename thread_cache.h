@@ -21,8 +21,6 @@ public:
 	void* fetch_from_central_cache(size_t index);//一次取一定批量的内存//从central cache取内存要加锁
 	//void*有返回值														  //使用时一个返回，剩下的放到自由链表对应位置，下次再要内存就不用到central cache取
 
-
-
 private:
 	free_list _freelists[NFREE_LIST];//映射对齐的8字节数组//8 16 32...
 
