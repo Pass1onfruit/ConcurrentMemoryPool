@@ -9,7 +9,7 @@ using namespace std;
 const size_t MAX_SIZE = 64 * 1024;//64k //用const不用宏，调试时可以看见值
 const size_t NFREE_LIST = MAX_SIZE / 8;//free_list的大小
 const size_t MAX_PAGES = 129;//0~16找central cache调，没有锁没有竞争并发性能高，17~128页找page cache，超过128就直接找系统
-const size_t PAGE_SHIFT = 12; // 4k为页移位
+const size_t PAGE_SHIFT = 12; //4k为页移位
 
 inline void*& next_obj(void* obj)//取下一个对象//内联
 {
