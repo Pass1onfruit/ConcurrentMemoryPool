@@ -35,5 +35,4 @@ private:
 	char* _start;
 	char* _end;//管理内存指针
 	T* _freList;//存内存的链表
-
 };
