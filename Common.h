@@ -13,7 +13,7 @@ const size_t PAGE_SHIFT = 12; //4k为页移位
 
 inline void*& next_obj(void* obj)//取下一个对象//内联
 {
-	return *((void**)obj);
+	return* ((void**)obj);
 }
 
 class free_list//自由链表储存申请了的内存//头删最好O(1)
