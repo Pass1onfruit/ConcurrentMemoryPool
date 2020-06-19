@@ -1,1 +1,37 @@
+为了学习理解tcmalloc
+用处：不是一个独立的东西，是作为一个基础的东西
+可以替换malloc/free（malloc底层也是内存池）
 
+池的概念：内存调用是有消耗的
+1（最重要） 解决性能问题
+2 解决内存碎片问题（内存释放的先后顺序问题，内存不连续，有内存，申请不出来）
+
+内存申请 内存回收
+释放的内存用链表一个个串联起来
+下次在取内存优先从链表取，因为系统的内存会越来越少
+
+如何使用tcmalloc？（并发场景下）
+一般情况下，把项目中的malloc替换成tcmalloc
+不同平台替换malloc的方式不同，基于unix的系统上的glibc,使用了weak alias的方式替换
+因为这些入口函数都被定义成了weak symbols，再加上icc支持alias attribute，所以替换就变成了这种通用形式:
+void* malloc(size_t size) THROW attribute_((alias (tc_malloc))
+因此所有malloc的调用都跳转到了tc_malloc的实现
+有的平台（windows）不支持这样的东西，要用hook的钩子技术来做
+
+三层
+thread cache  实现高性能
+central cache  进行资源均衡，要用就拿走用，不用了就放到下一层进行合并，可以给其他线程用
+page cache  处理回收回来的页
+
+thread cache挂的是8，16，24...字节的对象，central cache和page cache挂的是span的list；无锁的0 (1)内存申请和释放；每个线程都可以通过自己的tls对象无锁获取到自己的Freelist表；
+
+能不能把page cache和central cache？
+不能。映射关系不一样，
+
+central cache挂的span是是以8，16，24...字节页为单位映射，几个页的集合，均衡多个thread cache之间的资源平衡；当span的内存对象都回收回来了以后,那么表示span就可以回收给page；
+
+page cache挂的span是以页的个数为单位映射，页的分裂切割，页的合并
+
+线程结束后,线程申请的内存还在thread cache里面,怎么办?
+int pthread_key_create (pthread key_t *key, void (*destr_function) (void *))
+实现一个destr_function,会在线程结束的时候调用, destr-function就可以去释放thread cache中的内存...一般不会发生（内存泄漏）tcmalloc中是这样做的
